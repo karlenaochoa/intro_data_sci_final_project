@@ -20,10 +20,16 @@ library(wesanderson)
 library(forcats)
 library(pander)
 
+#Just a heads up, I did not have "cowplot" or "wesanderson" installed. 
+#Since these are less common packages it might be helpful to note to install them. 
+#Having this in RMD format would have been nice to see how/if it knits. 
+
+
 #create function to find column numbers given column names
 .rcol <- function(column.name.as.string = NULL, data = df) {
   grep(column.name.as.string, colnames(data))
 }
+#I've never used this function, seems interesting, but why not just use indexing or select by column names?
 
 #import data
 df <- import(here::here("data", "dataSPSS.sav"), setclass = "tibble") %>%
@@ -73,8 +79,10 @@ df[which(df[, "web"] == "No, do not do this"), "sns"] <- "Rarely if ever"
 df <- df %>%
   select(-web)
 
+#you could probably keep this within the same pipe to condense code. 
+
 #rename the values in the website column
-df <- df %>%
+df <- df %>% #you could also use "%<>% and it will save it to the dataframe
   mutate(website = recode(website, a = "Twitter",
                                    b = "Instagram",
                                    c = "Facebook",
@@ -82,7 +90,7 @@ df <- df %>%
                                    e = "YouTube"))
 
 #rename poorly named columns for sanity
-df <- df %>%
+df <- df %>% # This was super helpful. 
   rename(id = respid,
          date = int_date,
          int_use_freq = intfreq,
@@ -179,6 +187,7 @@ plot_data <- df %>%
   filter(!is.na(yn) & !str_detect(yn, "VOL")) %>% 
   mutate(book_format = factor(book_format),
          yn = factor(yn)) 
+#keeping id in here might be hepful for tracking in case there are any outliers. 
 
 ####
 
@@ -198,6 +207,7 @@ bar_plot <- plot_data %>%
         plot.title = element_text(size = 15, hjust = 0))
 
 bar_plot
+#looks really good! The only think I would suggest is to remove the part of the subtitle that says "Respondents 18-99".
 
 
 
@@ -237,6 +247,7 @@ point_plot <- plot_data %>%
         plot.title = element_text(size = 15, hjust = 0))
 
 point_plot
+#looks good! Audio and print are written out, maybe do the same for elect. 
 
 # Average books read by format
 point_plot2 <- plot_data %>% 
@@ -246,7 +257,7 @@ point_plot2 <- plot_data %>%
   geom_point() +
   geom_smooth(method = 'lm',
               aes(color = book_format)) +
-  scale_color_manual(values = wes_palette("Darjeeling1")) +
+  scale_color_manual(values = wes_palette("Darjeeling1")) + # I got an error here. 
   facet_wrap(~book_format, nrow = 3, ncol = 1) +
   theme(legend.position = "none") +
   labs(y = "Average Books Read",
@@ -257,6 +268,7 @@ point_plot2 <- plot_data %>%
         plot.title = element_text(size = 15, hjust = 0))
 
 point_plot2
+#could not run this plot. 
 
 # Regression model to see how age and format of books relates to average number of books read. 
 reg_data <- plot_data %>%
@@ -268,6 +280,7 @@ model
 
 # Put anova of regression model into a table
 pander(anova(model))
+#nice job fitting a model!
 
 ###############################################
 ######### Ash's Data Visualizations ###########
@@ -303,6 +316,8 @@ plot_ash1 <- plot_data_ash %>%
   coord_cartesian(ylim = c(2.5, 4)) 
 
 plot_ash1
+#Interesting plot! I think it would be helpful to save the data and then start a new code chunk for the plot. It's a really long plot. 
+#Change main title.
 
 #Graph number 2 data prep:
 
@@ -359,6 +374,7 @@ plot_ash3 <- plot_data_ash %>%
        colour = "Political party")
 
 plot_ash3
+#Interesting! If you want them all in one row for side by side comparisons, you can use nrow = 1 within facetwrap.  
 
 #Yet another plot
 
@@ -382,3 +398,4 @@ plot_ash4 <- plot_data_ash %>%
        colour = "Gender identity")
 
 plot_ash4
+#change main title. 
